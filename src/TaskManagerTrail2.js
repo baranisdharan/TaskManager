@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Form, Button, Card, ListGroup, OverlayTrigger, Tooltip, InputGroup,Dropdown } from 'react-bootstrap';
-import { FaPlus, FaMinus, FaClock } from 'react-icons/fa';
+import { Form, Button, Card, ListGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { FaPlus, FaMinus } from 'react-icons/fa';
 import { MdEdit, MdDeleteForever } from 'react-icons/md';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+
 
 const TaskManager = () => {
   const [tasks, setTasks] = useState([]);
@@ -74,9 +73,10 @@ const TaskManager = () => {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
       <div style={{ width: '400px' }}>
-        <Card >
-        <Card.Title style={{ backgroundColor: 'white',marginLeft: '10px',marginRight:'10px',marginBottom:'0px'  }}>
-              <div style={{ display: 'flex', alignItems: 'center'}}>
+        <Card>
+          <Card.Body>
+            <Card.Title>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span>TASKS {totalTasks}</span>
                 <OverlayTrigger placement="top" overlay={addTaskTooltip}>
                   <Button variant="link" onClick={handleExpand} style={{ marginLeft: 'auto' }}>
@@ -85,11 +85,10 @@ const TaskManager = () => {
                 </OverlayTrigger>
               </div>
             </Card.Title>
-            <Card.Body style={{ backgroundColor: isExpanded ? 'lightBlue' : 'white' }}>            
-            {isExpanded && 
+            {isExpanded && (
               <>
-                <Form onSubmit={handleSubmit} >
-                  <Form.Group style={{ marginTop: '0px' }}>
+                <Form onSubmit={handleSubmit}>
+                  <Form.Group style={{ marginTop: '10px' }}>
                     <Form.Label>Task Description:</Form.Label>
                     <Form.Control
                       type="text"
@@ -101,40 +100,27 @@ const TaskManager = () => {
                   </Form.Group>
 
                   <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                    <InputGroup style={{ flex: '1' }}>
+                    <Form.Group style={{ flex: '1' }}>
                       <Form.Label>Date:</Form.Label>
-                      <DatePicker
-                        selected={newTask.date ? new Date(newTask.date) : null}
-                        onChange={(date) => setNewTask({ ...newTask, date: date.toISOString().split('T')[0] })}
-                        className="form-control"
-                        dateFormat="MM/dd/yyyy"
-                        placeholderText='Select Date'
+                      <Form.Control
+                        type="date"
+                        name="date"
+                        value={newTask.date}
+                        onChange={handleInputChange}
                         required
                       />
-                    </InputGroup>
+                    </Form.Group>
 
                     <Form.Group style={{ flex: '1' }}>
                       <Form.Label>Time:</Form.Label>
-                      <InputGroup>
-                        <InputGroup.Text><FaClock /></InputGroup.Text>
-                        <Form.Control
-                          as="select"
-                          name="time"
-                          value={newTask.time}
-                          onChange={handleInputChange}
-                          required
-                        >
-                          <option value="">Select Time</option>
-                          {Array.from(Array(48)).map((_, index) => {
-                            const time = new Date(0, 0, 0, 0, index * 30);
-                            const formattedTime = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                            return <option key={index} value={formattedTime}>{formattedTime}</option>;
-                          })}
-                        </Form.Control>
-                      </InputGroup>
+                      <Form.Control
+                        type="time"
+                        name="time"
+                        value={newTask.time}
+                        onChange={handleInputChange}
+                        required
+                      />
                     </Form.Group>
-
-
                   </div>
 
                   <Form.Group style={{ marginTop: '10px' }}>
@@ -143,28 +129,26 @@ const TaskManager = () => {
                       name="assignedUser"
                       value={newTask.assignedUser}
                       onChange={handleInputChange}
-                      
                       required
                     >
-                      
-                      <option value="Prem Kumar">Prem Kumar</option>
-                      <option value="Sai">Sai</option>
+                      <option value="">Select User</option>
+                      <option value="User 1">User 1</option>
+                      <option value="User 2">User 2</option>
                     </Form.Select>
                   </Form.Group>
 
                   <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-
-                    <Button variant="Light" onClick={() => setIsExpanded(false)}>
-                      Cancel
-                    </Button>
-                    <Button variant="success" type="submit" style={{ marginLeft: '10px' }}>
+                    <Button variant="primary" type="submit" style={{ marginRight: '10px' }}>
                       {editTask ? 'Update Task' : 'Save'}
+                    </Button>
+                    <Button variant="secondary" onClick={() => setIsExpanded(false)}>
+                      Cancel
                     </Button>
                   </div>
                 </Form>
                 <br />
               </>
-            }
+            )}
 
             {tasks.length === 0 ? (
               <div></div>
@@ -172,14 +156,13 @@ const TaskManager = () => {
               <ListGroup>
                 {tasks.map((task) => (
                   <ListGroup.Item key={task.id}>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <div style={{ marginRight: 'auto', fontWeight: 'bold' }}>{task.description}</div>
 
-                      <Button
-                        variant="secondary"
-                        onClick={() => handleEdit(task.id)}
-                        style={{ padding: 0, marginRight: '10px' }}
-                      >
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <div style={{ marginRight: 'auto', fontWeight: 'bold' }}>
+                        {task.description}
+                      </div>
+
+                      <Button variant="secondary" onClick={() => handleEdit(task.id)} style={{ padding: 0, marginRight: '10px' }}>
                         <MdEdit size={16} style={{ color: 'black' }} />
                       </Button>
 
@@ -188,13 +171,19 @@ const TaskManager = () => {
                       </Button>
                     </div>
                     <div style={{ display: 'flex' }}>
-                      <div style={{ marginRight: '10px' }}>{task.assignedUser}</div>
-                      <div style={{ marginRight: '10px' }}>{task.date}</div>
-                      <div style={{ marginRight: '10px' }}>{task.time}</div>
+                      <div style={{ marginRight: '10px' }}>
+                        {task.assignedUser}
+                      </div>
+                      <div style={{ marginRight: '10px' }}>
+                        {task.date}
+                      </div>
                     </div>
+
+
                   </ListGroup.Item>
                 ))}
               </ListGroup>
+
             )}
           </Card.Body>
         </Card>
